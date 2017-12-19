@@ -114,7 +114,7 @@ void CClientDialog::setBehavior(Behavior *behavior)
 	//CloseHandle(thread);
 	//thread = CreateThread(0, 0, RunClientDialog, (LPVOID)this, 0, 0);
 }
-
+/////////////////////////////////////////////////////////////
 void CClientDialog::run()
 {
   std::cout << "ClientDialog::run\r\n";
@@ -132,6 +132,7 @@ void CClientDialog::run()
   std::cout << "Waitd actions";
 
 }
+/////////////////////////////////////////////////////////////
 DWORD WINAPI CClientDialog::RunThreadFunction(LPVOID _lpParam)
 {
   CClientDialog* dialog = (CClientDialog*)_lpParam;
@@ -142,7 +143,7 @@ DWORD WINAPI CClientDialog::RunThreadFunction(LPVOID _lpParam)
   }
   return 1;
 }
-
+/////////////////////////////////////////////////////////////
 DWORD WINAPI CClientDialog::WriteThreadFunction(LPVOID _lpParam)
 {
   CClientDialog* dialog = (CClientDialog*)_lpParam;
@@ -153,7 +154,7 @@ DWORD WINAPI CClientDialog::WriteThreadFunction(LPVOID _lpParam)
   }
   return 1;
 }
-
+/////////////////////////////////////////////////////////////
 DWORD WINAPI CClientDialog::ActionThreadFunction(LPVOID _lpParam)
 {
   CClientDialog* dialog = (CClientDialog*)_lpParam;
@@ -166,6 +167,7 @@ DWORD WINAPI CClientDialog::ActionThreadFunction(LPVOID _lpParam)
   }
   return 1;
 }
+/////////////////////////////////////////////////////////////
 DWORD WINAPI CClientDialog::ReadThreadFunction(LPVOID _lpParam)
 {
   CClientDialog* dialog = (CClientDialog*)_lpParam;
@@ -176,7 +178,7 @@ DWORD WINAPI CClientDialog::ReadThreadFunction(LPVOID _lpParam)
   }
   return 1;
 }
-
+/////////////////////////////////////////////////////////////
 
 void CClientDialog::read()
 {
@@ -195,6 +197,7 @@ void CClientDialog::read()
       ReleaseMutex(m_forActionQueueMutex);
   	}
 }
+/////////////////////////////////////////////////////////////
 void CClientDialog::action()
 {
   std::string buf;
@@ -225,7 +228,7 @@ void CClientDialog::action()
   }
   std::cout << "stop";
 }
-
+/////////////////////////////////////////////////////////////
 void CClientDialog::write()
 {
   std::string buf;
@@ -251,6 +254,7 @@ void CClientDialog::write()
     }
   }
 }
+/////////////////////////////////////////////////////////////
 void CClientDialog::stop()
 {
 
@@ -271,3 +275,4 @@ void CClientDialog::stop()
   m_forWriteQueueMutex = NULL;
 
 }
+/////////////////////////////////////////////////////////////

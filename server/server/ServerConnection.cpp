@@ -1,7 +1,6 @@
 ﻿
 #include "ServerConnection.h"
 #include<iostream>
-#include<thread>
 #include"ClientDialog.h"
 #include<vector >
 
@@ -9,6 +8,7 @@
 CServerConnection::CServerConnection()
 {
 	m_thread = NULL;
+  
 }
 
 /////////////////////////////////////////////////////////////
@@ -89,18 +89,13 @@ void  CServerConnection::handle()
 {
 
 	//HANDLE *threads = new HANDLE[100];
-	const WORD MAX_CLIENT_COUNT = 1;
-	WORD client_count = 0;
+	const WORD MAX_CLIENT_COUNT = 2;
+
   m_clients.reserve(MAX_CLIENT_COUNT);
   m_sockets.reserve(MAX_CLIENT_COUNT);
   m_address.reserve(MAX_CLIENT_COUNT);
-	//std::vector<CClientDialog*> clients(MAX_CLIENT_COUNT);
-	//std::vector<SOCKET*> sockets(MAX_CLIENT_COUNT);
-	//std::vector<sockaddr_in*> address(MAX_CLIENT_COUNT);
-
-	//CClientDialog **clients = new CClientDialog*[MAX_CLIENT_COUNT];
-	//SOCKET **sockets = new SOCKET*[MAX_CLIENT_COUNT];
-	//sockaddr_in **address = new sockaddr_in*[MAX_CLIENT_COUNT];
+  m_deleteTimer = CreateTimerQueue();
+  CreateTimerQueueTimer(&m_deleteTimer, m_deleteTimerQueue, (WAITORTIMERCALLBACK)&DeleteConnectionsByTimer, (LPVOID)this, 0, 1000, 0);
 	while (true)
 	{
 		//SOCKET accept_client;
@@ -112,7 +107,7 @@ void  CServerConnection::handle()
 		
 		//ждет, пока подключится клиент
 		SOCKET *socket = new SOCKET(accept(m_socket, (sockaddr*)addr, &addr_len));
-		if (*socket  != INVALID_SOCKET)
+    if (*socket != INVALID_SOCKET && m_clients.size() < MAX_CLIENT_COUNT)
 		{
 			m_sockets.push_back(socket);
 			std::cout << "Connect client: \n";
@@ -135,14 +130,11 @@ void  CServerConnection::handle()
 			//clientThread.detach();
       deleteStopClients();
       Sleep(50);
-      client_count++;
-			if (m_clients.size() > MAX_CLIENT_COUNT)
-				break;
 			
 		}
 
 	}
-  std::cout << "\r\n SERVER CRASHED =( \r\n";
+  std::cout << "\r\nSERVER CRASHED =( \r\n";
   std::cout << m_clients.size() << " clients is too much for me\r\n";
 	for (int i = 0; i < m_clients.size(); i++)
 	{
@@ -222,7 +214,7 @@ int CServerConnection::checkSocket()
 	}
 	return 1;
 }
-
+/////////////////////////////////////////////////////////////
 void CServerConnection::deleteStopClients()
 {
   std::vector<int> stoppedIndex;
@@ -246,6 +238,16 @@ void CServerConnection::deleteStopClients()
     std::cout << "Delete " << stoppedIndex[i] << std::endl;
     
   }
-  std::cout << "I have " << m_clients.size() << " clients!\r\n";
+  //std::cout << "I have " << m_clients.size() << " clients!\r\n";
 
 }
+/////////////////////////////////////////////////////////////
+VOID CALLBACK CServerConnection::DeleteConnectionsByTimer(PVOID _lpParam, BOOL _timerOrWaitFired)
+{
+  CServerConnection *serverConnection = (CServerConnection*)_lpParam;
+  if (serverConnection)
+  {
+    serverConnection->deleteStopClients();
+  }
+}
+/////////////////////////////////////////////////////////////

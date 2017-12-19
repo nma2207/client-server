@@ -27,9 +27,10 @@ private:
 	WORD m_port;
 	HANDLE m_thread;
 	Behavior *m_behavior;
-  HANDLE m_hTimer;
-  HANDLE m_hTimerQueue;
-	static DWORD WINAPI RunServerConnection(LPVOID lpParam); //создает поток. в котором вызовется handle()
+  HANDLE m_deleteTimer = NULL;
+  HANDLE m_deleteTimerQueue = NULL;
 
+	static DWORD WINAPI RunServerConnection(LPVOID lpParam); //создает поток. в котором вызовется handle()
+  static VOID CALLBACK DeleteConnectionsByTimer(PVOID lpParam, BOOL TimerOrWaitFired);
 };
 
