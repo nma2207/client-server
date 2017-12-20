@@ -75,3 +75,4 @@ void CServer::setBehavior(WORD port, Behavior *behavior)
 		connection->setBehavior(behavior);
 	}
 }
+/////////////////////////////////////////////////////////////

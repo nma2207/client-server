@@ -19,6 +19,7 @@ CServerConnection::~CServerConnection()
 /////////////////////////////////////////////////////////////
 bool  CServerConnection::start(WORD port)
 {
+  m_status = CServerConnectionStatus::RUN;
 	m_port = port;
 	if (FAILED(WSAStartup(MAKEWORD(2, 2), &m_wData)))
 	{
@@ -89,7 +90,7 @@ void  CServerConnection::handle()
 {
 
 	//HANDLE *threads = new HANDLE[100];
-	const WORD MAX_CLIENT_COUNT = 2;
+	const WORD MAX_CLIENT_COUNT = 1;
 
   m_clients.reserve(MAX_CLIENT_COUNT);
   m_sockets.reserve(MAX_CLIENT_COUNT);
@@ -107,7 +108,7 @@ void  CServerConnection::handle()
 		
 		//ждет, пока подключится клиент
 		SOCKET *socket = new SOCKET(accept(m_socket, (sockaddr*)addr, &addr_len));
-    if (*socket != INVALID_SOCKET && m_clients.size() < MAX_CLIENT_COUNT)
+    if (*socket != INVALID_SOCKET )
 		{
 			m_sockets.push_back(socket);
 			std::cout << "Connect client: \n";
@@ -128,24 +129,32 @@ void  CServerConnection::handle()
 			//	ClientDialogRun, (void*)clients[thread_count], 0, 0);
 			//std::thread clientThread(ClientDialogRun, clients[thread_count]);
 			//clientThread.detach();
-      deleteStopClients();
+      //deleteStopClients();
+      if (m_clients.size() > MAX_CLIENT_COUNT)
+      {
+        m_status = CServerConnectionStatus::CRASHED;
+        std::cout << "connection crashed" << std::endl;
+
+        break;
+      }
       Sleep(50);
 			
 		}
 
 	}
+  m_status = CServerConnectionStatus::CRASHED;
   std::cout << "\r\nSERVER CRASHED =( \r\n";
   std::cout << m_clients.size() << " clients is too much for me\r\n";
-	for (int i = 0; i < m_clients.size(); i++)
-	{
-		delete m_sockets[i];
-		delete m_address[i];
-		//CloseHandle(threads[i]);
-		delete m_clients[i];
-	}
-  m_clients.erase(m_clients.begin(), m_clients.end());
-  m_sockets.erase(m_sockets.begin(), m_sockets.end());
-  m_address.erase(m_address.begin(), m_address.end());
+	//for (int i = 0; i < m_clients.size(); i++)
+	//{
+	//	delete m_sockets[i];
+	//	delete m_address[i];
+	//	//CloseHandle(threads[i]);
+	//	delete m_clients[i];
+	//}
+ // m_clients.erase(m_clients.begin(), m_clients.end());
+ // m_sockets.erase(m_sockets.begin(), m_sockets.end());
+ // m_address.erase(m_address.begin(), m_address.end());
 	
 
 }
@@ -192,7 +201,10 @@ int CServerConnection::checkSocket()
 	FD_SET(m_socket, &read_check_set);
 	FD_SET(m_socket, &write_check_set);
 	FD_SET(m_socket, &exctpt_check_set);
-
+  if (m_status == CServerConnectionStatus::CRASHED)
+  {
+    return -1;
+  }
 	//можно еще в каждом запилить проверку на 
 	//проверка на чтение
 	if (SOCKET_ERROR == select(0, &read_check_set, 0, 0, NULL))
@@ -212,6 +224,7 @@ int CServerConnection::checkSocket()
 		if (!FD_ISSET(m_socket, &exctpt_check_set))
 			return -1;
 	}
+
 	return 1;
 }
 /////////////////////////////////////////////////////////////

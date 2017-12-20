@@ -4,7 +4,11 @@
 #include<vector>
 #include"ClientDialog.h"
 #pragma comment(lib, "ws2_32.lib")
-
+enum class CServerConnectionStatus{
+  RUN,
+  CRASHED,
+  STOP
+};
 class CServerConnection
 {
 public:
@@ -16,7 +20,9 @@ public:
 	int checkSocket(); //проверка сокета
 	void run(); //в потоке запускает handle()
 	void setBehavior(Behavior *);
+  CServerConnectionStatus getStatus()const { return m_status; }
 private:
+  CServerConnectionStatus m_status = CServerConnectionStatus::STOP;
 	void handle(); //подсоединяет клиентов
   void deleteStopClients();
 	std::vector<CClientDialog*> m_clients;

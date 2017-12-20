@@ -26,15 +26,16 @@ void ConnectController::addConnection(WORD port, CServerConnection *connection)
 //проверяет каждое соединение и если оно плохое, закрывавет его и запускает заново
 void ConnectController::checkConnections()
 {
-	std::cout << "Check connections\r\n";
+  printf("Check connections %d\n", m_connections.size());
 	for (auto item : m_connections)
 	{
 		int res;
 		if ((res = item.second->checkSocket()) == -1)
 		{
-			std::cout << "BAD";
+			printf("BAD\n");
 			item.second->close();
 			item.second->start(item.first);
+      item.second->run();
 		}
 			
 	}
@@ -53,7 +54,7 @@ VOID CALLBACK ConnectController::CheckConnectionsByTimer(PVOID lpParam, BOOL Tim
 void ConnectController::startTimer()
 {
 	m_hTimer = CreateTimerQueue();
-	CreateTimerQueueTimer(&m_hTimer, m_hTimerQueue, (WAITORTIMERCALLBACK)&CheckConnectionsByTimer, (LPVOID)this, 0, 100000, 0);
+	CreateTimerQueueTimer(&m_hTimer, m_hTimerQueue, (WAITORTIMERCALLBACK)&CheckConnectionsByTimer, (LPVOID)this, 0, 1000, 0);
 
 }
 
@@ -70,3 +71,4 @@ void ConnectController::deleteConnection(WORD port)
 	auto it = m_connections.find(port);
 	m_connections.erase(it);
 }
+/////////////////////////////////////////////////////////////
