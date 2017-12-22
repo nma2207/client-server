@@ -190,11 +190,17 @@ void CClientDialog::read()
   	{
   		ZeroMemory(buffer, MAX_BUF_SIZE);
   		int k = recv(*m_socket, buffer, sizeof(buffer), NULL);
+      if (k <= 0)
+      {
+        break;
+      }
   		std::cout << strlen(buffer) << std::endl;
-      WaitForSingleObject(m_forActionQueueMutex, INFINITE);
-      m_forAction.push(std::string(buffer));
-      std::cout << "Add to for action " << buffer<<std::endl;
-      ReleaseMutex(m_forActionQueueMutex);
+      std::cout << "Add to for action " << buffer << std::endl;
+      s_onRead(this, std::string(buffer));
+      //WaitForSingleObject(m_forActionQueueMutex, INFINITE);
+      //m_forAction.push(std::string(buffer));
+      //std::cout << "Add to for action " << buffer<<std::endl;
+      //ReleaseMutex(m_forActionQueueMutex);
   	}
 }
 /////////////////////////////////////////////////////////////
@@ -276,3 +282,46 @@ void CClientDialog::stop()
 
 }
 /////////////////////////////////////////////////////////////
+
+void WINAPI CClientDialog::s_onRead(LPVOID _lpParam, const std::string& _msg)
+{
+  CClientDialog *client = (CClientDialog*)_lpParam;
+  if (client)
+  {
+    client->onRead(_msg);
+  }
+}
+//////////////////////////////////////////////////////////
+void CClientDialog::onRead(const std::string& _msg)
+{
+
+    char *buf_char = new char[_msg.length() + 1];
+    strcpy_s(buf_char, _msg.length() + 1, _msg.c_str());
+    m_behavior->action(buf_char);
+    //WaitForSingleObject(m_forWriteQueueMutex, INFINITE);
+    //m_forWrite.push(std::string(buf_char));
+    std::cout << "Add to for write " << buf_char << std::endl;
+    s_onWrite(this, std::string(buf_char));
+    //ReleaseMutex(m_forWriteQueueMutex);
+
+}
+
+
+void WINAPI CClientDialog::s_onWrite(LPVOID _lpParam, const std::string& _msg)
+{
+  CClientDialog *client = (CClientDialog*)_lpParam;
+  if (client)
+  {
+    client->onWrite(_msg);
+  }
+}
+
+void CClientDialog::onWrite(const std::string& _msg)
+{
+  std::cout << "send " << _msg << std::endl;
+  if (send(*m_socket, _msg.c_str(), _msg.length() + 1, 0) == SOCKET_ERROR)
+  {
+    puts("Send failed");
+    std::cout << WSAGetLastError() << std::endl;
+  }
+}

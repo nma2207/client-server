@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include "Client.h"
 
@@ -6,11 +6,21 @@
 #include"Client.h"
 #include<iostream>
 #include<string>
-CClient::CClient()
+CClient::CClient(DWORD _msgLength, WORD _sleepTime)
 {
-
+  m_msgLength = _msgLength;
+  m_sleepTime = _sleepTime;
 }
 
+void generateMSG(char *_msg, DWORD _length)
+{
+  for (DWORD i = 0; i < _length - 1; i++)
+  {
+    //генерим рандомные буквы
+    _msg[i] = 'a' + rand() % 26;
+  }
+  _msg[_length - 1] = '\0';
+}
 
 CClient::~CClient()
 {
@@ -62,34 +72,20 @@ void CClient::run()
 	setlocale(0, "");
 	std::cout << "Client run!" << std::endl;
 	
-	char buf[1024];
-  char buf1[2049];
+	char* buf=new char[m_msgLength];
 	std::cin.ignore();
+  
 	while (true)
 	{
-		ZeroMemory(buf, 1024);
-    ZeroMemory(buf1, 2049);
+		ZeroMemory(buf, m_msgLength);
+    generateMSG(buf, m_msgLength);
 		std::cout << "=> ";
 //		std::gets(buf);
-		
-		std::cin.getline(buf, 1024);
 		//std::cout << "ad";
 		if (strcmp(buf, "") == 0)
 			continue;
-    strcat(buf1, buf);
-    strcat(buf1 + strlen(buf) + 1, buf);
-    buf1[strlen(buf)] = '\t';
-    buf1[strlen(buf) - 1] = '\t';
-    for (int i = 0; i < 2 * strlen(buf) * 2 + 1; i++)
-      std::cout << buf1[i];
-    std::cout << std::endl;
-		if (send(m_socket, buf1, strlen(buf1)+1, 0) == SOCKET_ERROR)
-		{
-			puts("Send failed");
-			std::cout << WSAGetLastError() << std::endl;
-      if (strcmp(buf, "exit") == 0)
-        break;
-		}
+
+
     if (send(m_socket, buf, strlen(buf) + 1, 0) == SOCKET_ERROR)
     {
       puts("Send failed");
@@ -101,9 +97,7 @@ void CClient::run()
 		//std::cout << "asd";
 		recv(m_socket, buf, 1024, NULL);
 		std::cout << buf << std::endl;
-    ZeroMemory(buf, 1024);
-    recv(m_socket, buf, 1024, NULL);
-    std::cout << buf << std::endl;
+    Sleep(m_sleepTime);
 	}
   system("pause");
 }

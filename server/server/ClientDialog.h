@@ -42,6 +42,8 @@ _▌▀▐▄█▄█▌▄▒▀▒▒▒▒▒▒░░░░░░▒▒▒�
 ──▐▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▀▀
 */
 
+
+
 enum class ClientDialogStatus{
   RUN,
   STOP
@@ -73,6 +75,10 @@ private:
 	sockaddr_in *m_addres;
 	//std::thread *thread;
 	Behavior *m_behavior;
+  void onRead(const std::string&_msg);
+  static void WINAPI s_onRead(LPVOID _lpParam,const std::string& _msg);
+  void onWrite(const std::string&_msg);
+  static void WINAPI s_onWrite(LPVOID _lpParam, const std::string& _msg);
 	static DWORD WINAPI WriteThreadFunction(LPVOID _lpParam);//чтобы запустить run
   static DWORD WINAPI ActionThreadFunction(LPVOID _lpParam);//чтобы запустить run
   static DWORD WINAPI ReadThreadFunction(LPVOID _lpParam);//чтобы запустить run

@@ -54,7 +54,7 @@ VOID CALLBACK ConnectController::CheckConnectionsByTimer(PVOID lpParam, BOOL Tim
 void ConnectController::startTimer()
 {
 	m_hTimer = CreateTimerQueue();
-	CreateTimerQueueTimer(&m_hTimer, m_hTimerQueue, (WAITORTIMERCALLBACK)&CheckConnectionsByTimer, (LPVOID)this, 0, 1000, 0);
+	CreateTimerQueueTimer(&m_hTimer, m_hTimerQueue, (WAITORTIMERCALLBACK)&CheckConnectionsByTimer, (LPVOID)this, 0, 10000, 0);
 
 }
 

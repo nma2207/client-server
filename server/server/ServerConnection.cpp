@@ -90,7 +90,7 @@ void  CServerConnection::handle()
 {
 
 	//HANDLE *threads = new HANDLE[100];
-	const WORD MAX_CLIENT_COUNT = 1;
+	const WORD MAX_CLIENT_COUNT = 100;
 
   m_clients.reserve(MAX_CLIENT_COUNT);
   m_sockets.reserve(MAX_CLIENT_COUNT);
