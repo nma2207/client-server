@@ -6,7 +6,7 @@
 class CClient
 {
 public:
-	CClient(DWORD _msgLength, WORD _sleepTime);
+	CClient(DWORD _msgLength, WORD _sleepTime, int _num);
 	~CClient();
 	bool connectToServer(char *ip_addr, WORD port);
 	void run();
@@ -17,6 +17,7 @@ private:
 	SOCKET m_socket;
   DWORD m_msgLength;
   WORD m_sleepTime;
+  int m_num;
 
 
 };

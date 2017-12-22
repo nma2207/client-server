@@ -118,16 +118,16 @@ void CClientDialog::setBehavior(Behavior *behavior)
 void CClientDialog::run()
 {
   std::cout << "ClientDialog::run\r\n";
-  m_forWrite.push(std::string("You have been watching\nBe prepared...\n"));
-  m_forActionQueueMutex = CreateMutex(NULL, FALSE, NULL);
-  m_forWriteQueueMutex = CreateMutex(NULL, FALSE, NULL);
-  m_writeThread = CreateThread(0, 0, WriteThreadFunction, this, 0, 0);
+  //m_forWrite.push(std::string("You have been watching\nBe prepared...\n"));
+  //m_forActionQueueMutex = CreateMutex(NULL, FALSE, NULL);
+  //m_forWriteQueueMutex = CreateMutex(NULL, FALSE, NULL);
+  //m_writeThread = CreateThread(0, 0, WriteThreadFunction, this, 0, 0);
   m_readThread = CreateThread(0, 0, ReadThreadFunction, this, 0, 0);
-  m_actionThread = CreateThread(0, 0, ActionThreadFunction, this, 0, 0);
+  //m_actionThread = CreateThread(0, 0, ActionThreadFunction, this, 0, 0);
   m_status = ClientDialogStatus::RUN;
-  WaitForSingleObject(m_actionThread, INFINITE);
-  stop();
-  m_status = ClientDialogStatus::STOP;
+  //WaitForSingleObject(m_actionThread, INFINITE);
+  //stop();
+  //m_status = ClientDialogStatus::STOP;
 
   std::cout << "Waitd actions";
 

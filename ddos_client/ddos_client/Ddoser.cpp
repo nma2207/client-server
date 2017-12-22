@@ -33,7 +33,7 @@ void CDdoser::initClients()
   m_clients.reserve(m_clientsCount);
   for (int i = 0; i < m_clientsCount; i++)
   {
-    CClient *newClient = new CClient(m_msgLength, m_sleepTime);
+    CClient *newClient = new CClient(m_msgLength, m_sleepTime,i);
     newClient->connectToServer(m_ip, m_port);
     //newClient->run();
     m_clients.push_back(newClient);

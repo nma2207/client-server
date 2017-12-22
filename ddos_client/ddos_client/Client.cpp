@@ -6,10 +6,12 @@
 #include"Client.h"
 #include<iostream>
 #include<string>
-CClient::CClient(DWORD _msgLength, WORD _sleepTime)
+#include<fstream>
+CClient::CClient(DWORD _msgLength, WORD _sleepTime, int _num)
 {
   m_msgLength = _msgLength;
   m_sleepTime = _sleepTime;
+  m_num = _num;
 }
 
 void generateMSG(char *_msg, DWORD _length)
@@ -50,13 +52,13 @@ bool CClient::connectToServer(char *ip_address, WORD port)
 
 	char server_reply[2000];
 	std::cout << "CONNECTED TO SERVER!" << std::endl;
-	if (SOCKET_ERROR == recv(m_socket, server_reply, 2000, 0))
-	{
-		std::cout << "Cannot get reply " << WSAGetLastError() << std::endl;
-		return false;
-	}
-	else
-		std::cout << server_reply << std::endl;
+	//if (SOCKET_ERROR == recv(m_socket, server_reply, 2000, 0))
+	//{
+	//	std::cout << "Cannot get reply " << WSAGetLastError() << std::endl;
+	//	return false;
+	//}
+	//else
+	//	std::cout << server_reply << std::endl;
 	return true;
 
 
@@ -70,18 +72,20 @@ void CClient::disconnect()
 void CClient::run()
 {
 	setlocale(0, "");
-	std::cout << "Client run!" << std::endl;
+  std::ofstream out(std::to_string(m_num) + ".txt");
+	out << "Client run!" << std::endl;
 	
 	char* buf=new char[m_msgLength];
-	std::cin.ignore();
-  
+	//std::cin.ignore();
+ 
 	while (true)
 	{
 		ZeroMemory(buf, m_msgLength);
     generateMSG(buf, m_msgLength);
-		std::cout << "=> ";
+		out << "=> ";
 //		std::gets(buf);
 		//std::cout << "ad";
+    out << buf << std::endl;
 		if (strcmp(buf, "") == 0)
 			continue;
 
@@ -89,14 +93,14 @@ void CClient::run()
     if (send(m_socket, buf, strlen(buf) + 1, 0) == SOCKET_ERROR)
     {
       puts("Send failed");
-      std::cout << WSAGetLastError() << std::endl;
+      out << WSAGetLastError() << std::endl;
       if (strcmp(buf, "exit") == 0)
         break;
     }
 		
 		//std::cout << "asd";
 		recv(m_socket, buf, 1024, NULL);
-		std::cout << buf << std::endl;
+		out << buf << std::endl;
     Sleep(m_sleepTime);
 	}
   system("pause");
