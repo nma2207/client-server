@@ -185,18 +185,22 @@ void CClientDialog::read()
   	std::cout << "ClientDialog:: run!" << std::endl;
   	char buffer[MAX_BUF_SIZE];
   	//ZeroMemory(buffer, MAX_BUF_SIZE);
-
+    
   	while (true)
   	{
   		ZeroMemory(buffer, MAX_BUF_SIZE);
-  		int k = recv(*m_socket, buffer, sizeof(buffer), NULL);
-      if (k <= 0)
+      std::string msg = "";
+      int k = 0;
+      do
       {
-        break;
-      }
-  		std::cout << strlen(buffer) << std::endl;
-      std::cout << "Add to for action " << buffer << std::endl;
-      s_onRead(this, std::string(buffer));
+        k = recv(*m_socket, buffer, sizeof(buffer), NULL);
+        std::cout << "k = " << k << std::endl;
+        msg.append(buffer, buffer + k);
+      } while (k>0 && buffer[k-1] !='\t');
+
+      std::cout << msg.length() << std::endl;
+      std::cout << "Add to for action " << msg << std::endl;
+      s_onRead(this, msg);
       //WaitForSingleObject(m_forActionQueueMutex, INFINITE);
       //m_forAction.push(std::string(buffer));
       //std::cout << "Add to for action " << buffer<<std::endl;

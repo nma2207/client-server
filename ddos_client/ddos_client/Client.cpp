@@ -73,7 +73,7 @@ void CClient::run()
 {
 	setlocale(0, "");
   std::ofstream out(std::to_string(m_num) + ".txt");
-	out << "Client run!" << std::endl;
+  std::cout << "Client run!" << std::endl;
 	
 	char* buf=new char[m_msgLength];
 	//std::cin.ignore();
@@ -82,28 +82,29 @@ void CClient::run()
 	{
 		ZeroMemory(buf, m_msgLength);
     generateMSG(buf, m_msgLength);
-		out << "=> ";
+    std::cout << "=> ";
 //		std::gets(buf);
 		//std::cout << "ad";
-    out << buf << std::endl;
+    std::cout << buf << std::endl;
 		if (strcmp(buf, "") == 0)
 			continue;
 
-
-    if (send(m_socket, buf, strlen(buf) + 1, 0) == SOCKET_ERROR)
+    int k;
+    if (k=send(m_socket, buf, strlen(buf) + 1, 0) == SOCKET_ERROR)
     {
       puts("Send failed");
-      out << WSAGetLastError() << std::endl;
+      std::cout << WSAGetLastError() << std::endl;
       if (strcmp(buf, "exit") == 0)
         break;
     }
-		
+    std::cout << "k = " << k << std::endl;
 		//std::cout << "asd";
-		recv(m_socket, buf, 1024, NULL);
-		out << buf << std::endl;
-    Sleep(m_sleepTime);
+    recv(m_socket, buf, m_msgLength, NULL);
+    std::cout << buf << std::endl;
+    //Sleep(m_sleepTime);
 	}
-  system("pause");
+  out.close();
+  //system("pause");
 }
 
 
